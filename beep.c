@@ -24,7 +24,7 @@
 #include <linux/miscdevice.h>
 #include <asm/uaccess.h>
 #if defined(CONFIG_MIPS) || defined(CONFIG_X86)
-#include <asm/i8253.h>
+#include <linux/i8253.h>
 #else
 #include <asm/8253pit.h>
 static DEFINE_SPINLOCK(i8253_lock);
@@ -96,7 +96,7 @@ static ssize_t read_beep(struct file * file, char * buffer, size_t len,
   /*     return -ESPIPE; */
   /* You can seek, but it doesn't do anything... */
 
-  if (!access_ok(VERIFY_WRITE, buffer, sizeof(what_beep))) {
+  if (!access_ok(buffer, sizeof(what_beep))) {
     what_beep = 0;
     return -EFAULT;
   }
@@ -165,7 +165,7 @@ static int beep_event(struct input_dev *dev, unsigned int type,
       if (value > 20 && value < 32767)
         count = PIT_TICK_RATE / value;
       
-      spin_lock_irqsave(&i8253_lock, flags);
+      raw_spin_lock_irqsave(&i8253_lock, flags);
       
       if (count) {
         /* enable counter 2 */
@@ -180,7 +180,7 @@ static int beep_event(struct input_dev *dev, unsigned int type,
 		outb(inb_p(0x61) & 0xFC, 0x61);
       }
       
-      spin_unlock_irqrestore(&i8253_lock, flags);
+      raw_spin_unlock_irqrestore(&i8253_lock, flags);
     }
   if (value) {
     what_beep=1;

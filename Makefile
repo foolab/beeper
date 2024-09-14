@@ -11,7 +11,7 @@ KDIR	:= $(shell if [ -d /lib64 ] && [ `uname -m` = amd64 ]; then echo /lib64; el
 PWD		:= `pwd`
 
 default:
-	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 endif
 
